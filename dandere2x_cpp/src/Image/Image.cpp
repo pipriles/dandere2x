@@ -5,6 +5,7 @@
 //    available at: https://www.gnu.org/licenses/gpl-3.0.txt
 
 #include "Image.h"
+#include <random>
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -81,4 +82,44 @@ Image::Color Image::construct_color(int x, int y) {
     color.b = stb_image[x * 3 + 3 * y * width + 2];
 
     return color;
+}
+
+// Prevent an integer from going above RGB limits to avoid problems in code.
+// i.e 266 -> 255
+int Image::bound_integer(int min, int max, int val) {
+    if (val <= min)
+        return min;
+    if (val >= max)
+        return max;
+
+    return val;
+}
+
+void Image::add_noise() {
+    std::random_device rd;
+
+    std::mt19937 e2(rd());
+
+    std::normal_distribution<> uniform_int_distribution(0, 2);
+
+    for (int i = 0; i < width; i++){
+        for (int j = 0; j < height; j++){
+            Color current = this->get_color(i,j);
+
+            //std::cout << uniform_int_distribution(e2) << std::endl;
+
+            int r = (int) current.r;
+            int g = (int) current.g;
+            int b = (int) current.b;
+
+            current.r = bound_integer(0, 255, r += (uniform_int_distribution(e2)));
+            current.g = bound_integer(0, 255, g += (uniform_int_distribution(e2)));
+            current.b = bound_integer(0, 255, b += (uniform_int_distribution(e2)));
+
+            this->set_color(i,j, current);
+        }
+    }
+
+
+
 }

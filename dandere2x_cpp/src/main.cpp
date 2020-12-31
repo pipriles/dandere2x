@@ -1,7 +1,7 @@
 #include "Driver.h" //driver_difference
 #include "Plugins/Fade/Fade.h"
 #include "Image/DebugImage/DebugImage.h"
-
+#include "Image.h"
 
 
 /*
@@ -12,21 +12,33 @@
 
 
 
+void benchmark(){
+
+    cout << "hi" << endl;
+    Image im = Image("C:\\Users\\Tyler\\Documents\\GitHub\\dandere2x\\src\\workspace\\gui\\subworkspace\\inputs\\frame42.jpg");
+    im.add_noise();
+
+    cout << im.width << endl;
+
+    DebugImage before = DebugImage::create_debug_from_image(im);
+    before.save("C:\\Users\\Tyler\\Documents\\GitHub\\dandere2x\\src\\workspace\\gui\\subworkspace\\debug_frames\\debug_output.png");
+}
+
 
 int main(int argc, char **argv) {
 
 //    cout << "hi" << endl;
-//    benchmark();
-////
+      //benchmark();
+//////
     bool debug = false; //debug flag
 
     //Initialize the variables needed for Dandere2x's driver. If debug = True, then we use these variables.
 
-    string workspace = "C:\\Users\\windwoz\\Desktop\\release\\workspace\\default\\";
+    string workspace = R"(C:\Users\Tyler\Documents\GitHub\dandere2x\src\workspace\gui\subworkspace\)";
     int frame_count = 205;
     int block_size = 30;
     int step_size = 8;
-    string run_type = "r";// 'n' or 'r'
+    string run_type = "n";// 'n' or 'r'
     int resume_frame = 200;
     string extension_type = ".jpg";
 

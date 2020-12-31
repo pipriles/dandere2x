@@ -34,10 +34,11 @@ using namespace std;
 const int correction_block_size = 2;
 
 #include <chrono>
+
 using namespace std::chrono;
 
 void driver_difference(string workspace, int resume_count, int frame_count,
-                       int block_size, int step_size, string extension_type)  {
+                       int block_size, int step_size, string extension_type) {
 
 
     // Create pre-fixes for all the files needed to be accessed during dandere2x's runtime.
@@ -51,12 +52,14 @@ void driver_difference(string workspace, int resume_count, int frame_count,
     string fade_prefix = workspace + separator() + "fade_data" + separator() + "fade_";
     string compressed_static_prefix = workspace + separator() + "compressed_static" + separator() + "compressed_";
     string compressed_moving_prefix = workspace + separator() + "compressed_static" + separator() + "compressed_";
-   // DANDERE2x_CPP DRIVER STARTS HERE //
+    // DANDERE2x_CPP DRIVER STARTS HERE //
 
-   // Before we start anything, we need to load the gensises image, image_1. This is because the first
-   // Image is treated sort of differently in Dandere2x - it's the only image we can gurantee it is a 'i' frame,
-   // And the entire image needs to be loaded.
+    std::cout << image_prefix + to_string(1) + extension_type << std::endl;
+    // Before we start anything, we need to load the gensises image, image_1. This is because the first
+    // Image is treated sort of differently in Dandere2x - it's the only image we can gurantee it is a 'i' frame,
+    // And the entire image needs to be loaded.
     shared_ptr<Image> image_1 = make_shared<Image>(image_prefix + to_string(1) + extension_type);
+    //image_1->add_noise();
 
     // Dandere2x_cpp Handles the resume case by leaving everything empty, which serves as a signal to
     // Dandere2x_python simply draw a new frame at the resume frame.
@@ -99,6 +102,7 @@ void driver_difference(string workspace, int resume_count, int frame_count,
         string image_2_compressed_static_file = compressed_static_prefix + to_string(x + 1) + ".jpg";
         string image_2_compressed_moving_file = compressed_moving_prefix + to_string(x + 1) + ".jpg";
 
+
         // Wait for those files...
         dandere2x::wait_for_file(image_2_file);
         dandere2x::wait_for_file(image_2_compressed_static_file);
@@ -108,7 +112,12 @@ void driver_difference(string workspace, int resume_count, int frame_count,
         shared_ptr<Image> image_2 = make_shared<Image>(image_2_file);
         shared_ptr<Image> image_2_copy = make_shared<Image>(image_2_file); //load im_2 twice for 'corrections'
         shared_ptr<Image> image_2_compressed_static = make_shared<Image>(image_2_compressed_static_file);
-        shared_ptr<Image> image_2_compressed_moving = make_shared<Image>(image_2_compressed_moving_file);
+
+        image_2->add_noise();
+        image_2_copy->add_noise();
+        image_2_compressed_static->add_noise();
+
+        //shared_ptr<Image> image_2_compressed_moving = make_shared<Image>(image_2_compressed_moving_file);
 
         // Create strings for the files we need to save for this computation iteration
         string p_data_file = p_data_prefix + to_string(x) + ".txt";
@@ -126,28 +135,30 @@ void driver_difference(string workspace, int resume_count, int frame_count,
 
         // First run the 'fade' plugin, which checks if two frames are simply fade to black / fade to white
         Fade fade = Fade(image_1, image_2, image_2_compressed_static, block_size, fade_file);
-        fade.run();
+        //fade.run();
 
         // Find similar blocks between image_1 and image_2 and match them, and document which matched (p_data_file).
         // Document which blocks we could not find a match for, and add them to a list of missing blocks (residual_file)
-        PFrame pframe = PFrame(image_1, image_2, image_2_compressed_static, image_2_compressed_moving, block_size, p_data_file, residual_file, step_size);
+        PFrame pframe = PFrame(image_1, image_2, image_2_compressed_static, image_2_compressed_static, block_size,
+                               p_data_file, residual_file, step_size);
         pframe.run();
 
         // When finding similar blocks, there may be small blemishes left in as a result. Try our best
         // To find those errors, and replace them with nearby pixels. Use the original image as a reference
         // On how to preform these corrections.
-        Correction correction = Correction(image_2, image_2_copy, image_2_compressed_static, correction_block_size, correction_file, 2);
-        correction.run();
+        Correction correction = Correction(image_2, image_2_copy, image_2_compressed_static, correction_block_size,
+                                           correction_file, 2);
+        // correction.run();
 
         // Save the results for Dandere2x_python to use
         pframe.save();
         fade.save();
         correction.save();
 
-       // For Debugging. Create a folder called 'debug_frames' in workspace when testing this -
-       // Enabling this will allow you to see what Dandere2x_Cpp is seeing when it finishes processing a frame.
-        DebugImage before = DebugImage::create_debug_from_image(*image_2);
-        before.save(workspace + "debug_frames" + separator() + "before_" + to_string(x) + ".png");
+        // For Debugging. Create a folder called 'debug_frames' in workspace when testing this -
+        // Enabling this will allow you to see what Dandere2x_Cpp is seeing when it finishes processing a frame.
+//        DebugImage before = DebugImage::create_debug_from_image(*image_2);
+//        before.save(workspace + "debug_frames" + separator() + "before_" + to_string(x) + ".png");
 
 
         // For the next iteration, we simply let frame 'x' become frame 'x+1'.
@@ -157,13 +168,13 @@ void driver_difference(string workspace, int resume_count, int frame_count,
 
         auto stop = high_resolution_clock::now();
         auto duration = duration_cast<microseconds>(stop - frame_time_start);
-        cout << "Calculation time for frame :  " <<  duration.count() << endl;
+        cout << "Calculation time for frame :  " << duration.count() << endl;
     }
 
     auto total_end = high_resolution_clock::now();
     auto total_duration = duration_cast<microseconds>(total_end - total_start);
 
-    cout << "total time:  " <<  total_duration.count() << endl;
+    cout << "total time:  " << total_duration.count() << endl;
 }
 
 #endif //DANDERE2X_DRIVER_H

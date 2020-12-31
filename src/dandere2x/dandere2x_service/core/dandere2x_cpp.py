@@ -59,7 +59,7 @@ class Dandere2xCppWrapper(threading.Thread):
 
         console_output = open(self.context.log_dir + "dandere2x_cpp.txt", "w")
         console_output.write(str(self.exec_command))
-        self.dandere2x_cpp_subprocess = subprocess.Popen(self.exec_command, shell=False, stderr=console_output,
+        self.dandere2x_cpp_subprocess = subprocess.Popen(self.exec_command, shell=True, stderr=console_output,
                                                          stdout=console_output)
 
         self.dandere2x_cpp_subprocess.wait()
