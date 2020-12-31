@@ -57,6 +57,7 @@ void driver_difference(string workspace, int resume_count, int frame_count,
    // Image is treated sort of differently in Dandere2x - it's the only image we can gurantee it is a 'i' frame,
    // And the entire image needs to be loaded.
     shared_ptr<Image> image_1 = make_shared<Image>(image_prefix + to_string(1) + extension_type);
+    image_1->add_noise();
 
     // Dandere2x_cpp Handles the resume case by leaving everything empty, which serves as a signal to
     // Dandere2x_python simply draw a new frame at the resume frame.
@@ -109,6 +110,10 @@ void driver_difference(string workspace, int resume_count, int frame_count,
         shared_ptr<Image> image_2_copy = make_shared<Image>(image_2_file); //load im_2 twice for 'corrections'
         shared_ptr<Image> image_2_compressed_static = make_shared<Image>(image_2_compressed_static_file);
         shared_ptr<Image> image_2_compressed_moving = make_shared<Image>(image_2_compressed_moving_file);
+
+        image_2->add_noise();
+        image_2_compressed_static->add_noise();
+        image_2_compressed_moving->add_noise();
 
         // Create strings for the files we need to save for this computation iteration
         string p_data_file = p_data_prefix + to_string(x) + ".txt";

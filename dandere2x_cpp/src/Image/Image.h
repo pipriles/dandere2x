@@ -69,6 +69,12 @@ public:
 
     void set_color(int x, int y, Color &color);
 
+    int bound_integer(int min, int max, int val);
+
+    void add_noise();
+
+
+
 private:
 
     Color construct_color(int x, int y);
