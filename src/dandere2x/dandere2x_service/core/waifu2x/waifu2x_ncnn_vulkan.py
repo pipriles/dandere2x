@@ -40,6 +40,9 @@ class Waifu2xNCNNVulkan(AbstractUpscaler, Thread):
         assert get_operating_system() != "win32" or os.path.exists(self.waifu2x_vulkan_path), \
             "%s does not exist!" % self.waifu2x_vulkan_path
 
+        print("File %s" % self.waifu2x_vulkan_path)
+        print("Does this exist? %s " % os.path.exists(self.waifu2x_vulkan_path))
+
         super().__init__(context, controller)
         Thread.__init__(self, name="Waifu2x Thread")
 
