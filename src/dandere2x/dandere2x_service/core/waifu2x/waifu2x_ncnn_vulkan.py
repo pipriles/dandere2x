@@ -88,8 +88,8 @@ class Waifu2xNCNNVulkan(AbstractUpscaler, Thread):
 
             if exec_command[x] == "[output_file]":
                 exec_command[x] = output_image
-        self.log.info("File %s" % self.waifu2x_vulkan_path)
-        self.log.info("Does this exist? %s " % os.path.exists(self.waifu2x_vulkan_path))
+        print("File %s" % self.waifu2x_vulkan_path)
+        print("Does this exist? %s " % os.path.exists(self.waifu2x_vulkan_path))
         console_output.write(str(exec_command))
         self.active_waifu2x_subprocess = subprocess.Popen(exec_command,
                                                           shell=False, stderr=console_output, stdout=console_output,
