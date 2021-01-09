@@ -12,4 +12,6 @@ copy_test.create_new(88,88)
 
 copy_test.copy_image(load_test)
 
+print("success!")
+
 
