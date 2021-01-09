@@ -97,6 +97,11 @@ class Frame:
 
         self.frame = imageio.imread(input_string).astype(np.uint8)
         print("shape %s -> %s" % (input_string, str(self.frame.shape)))
+
+        if self.frame.shape[0] == 3:
+            print("re-assigning")
+            self.frame = np.stack(self.frame, axis=2)
+
         self.height = self.frame.shape[0]
         self.width = self.frame.shape[1]
         self.string_name = input_string
