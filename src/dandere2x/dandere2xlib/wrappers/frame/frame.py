@@ -96,6 +96,7 @@ class Frame:
     def load_from_string(self, input_string):
 
         self.frame = imageio.imread(input_string).astype(np.uint8)
+        print("shape %s -> %s" % (input_string, str(self.frame.shape)))
         self.height = self.frame.shape[0]
         self.width = self.frame.shape[1]
         self.string_name = input_string
