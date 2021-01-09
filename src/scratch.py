@@ -4,10 +4,12 @@ import os
 if os.path.exists('writing_test.png'):
     os.remove('writing_test.png')
 
-test = Frame()
-test.create_new(100,100)
-test.save_image("writing_test.png")
+load_test = Frame()
+load_test.load_from_string("output_000477.png")
+
+copy_test = Frame()
+copy_test.create_new(88,88)
+
+copy_test.copy_image(load_test)
 
 
-new_test = Frame()
-new_test.load_from_string("writing_test.png")
