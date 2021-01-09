@@ -190,6 +190,8 @@ class Frame:
 
         """
 
+        print("Copying image %s other %s" % (self.string_name, frame_other.string_name))
+
         if self.height != frame_other.height or self.width != frame_other.width:
             self.logger.error('copy images are not equal')
             self.logger.error(str(self.width) + ' !=? ' + str(frame_other.width))
