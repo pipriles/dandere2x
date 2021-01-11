@@ -7,7 +7,7 @@
 
 #include "../Image/Image.h"
 
-class SSIM {
+class SSIM_MSE {
 
 public:
     static int getLumaColor(Image::Color &col, char color) {
@@ -40,10 +40,10 @@ public:
         return sum;
     }
 
-    static double ssim(Image &image_A, Image &image_B,
-                       int initial_x, int initial_y,
-                       int variable_x, int variable_y,
-                       int block_size){
+    static double ssim_mse(Image &image_A, Image &image_B,
+                           int initial_x, int initial_y,
+                           int variable_x, int variable_y,
+                           int block_size){
         double r = ssim_color(image_A, image_B, initial_x, initial_y, variable_x, variable_y, block_size, 'r');
         double g = ssim_color(image_A, image_B, initial_x, initial_y, variable_x, variable_y, block_size, 'g');
         double b = ssim_color(image_A, image_B, initial_x, initial_y, variable_x, variable_y, block_size, 'b');
@@ -89,7 +89,7 @@ public:
 
         double ssim = numerator / denominator;
 
-        // Variables used to stabalize a weak (or zero) denominator (similar to c1 c2 in SSIM-MSE)
+        // Variables used to stabalize a weak (or zero) denominator (similar to c1 c2 in SSIM_MSE-MSE)
         double d1 = pow(0.01 * (255*255), 2);
         double d2 = pow(0.03 * (255*255), 2);
 

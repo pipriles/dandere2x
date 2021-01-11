@@ -8,7 +8,7 @@
 #include "BlockMatch/ExhaustiveSearch.h"
 #include <omp.h>
 #include "Image/SSIM/SSIM-MSE.h"
-
+#include <Image/Graders/SSIM_Grader.h>
 
 // Note to self, what happens if pframes declares too many unmatched blocks, but fade made
 // predictions? This is a really niche scenario - I wouldn't imagine it to ever happen.
@@ -158,53 +158,12 @@ void PFrame::match_all_blocks() {
  */
 void PFrame::match_block(int x, int y) {
 
-    // Using the compressed image, determine a good measure of the minimum MSE required for the matched to have.
-    double min_ssim_static = SSIM::ssim(*image2, *image2_compressed_static,
-                                        x * block_size, y * block_size,
-                                        x * block_size, y * block_size,
-                                        block_size);
-
-    double min_ssim_moving = SSIM::ssim(*image2, *image2_compressed_moving,
-                                        x * block_size, y * block_size,
-                                        x * block_size, y * block_size,
-                                        block_size);
-
-    double min_mse_moving = ImageUtils::mse(*image2, *image2_compressed_moving,
-                                            x * block_size, y * block_size,
-                                            x * block_size, y * block_size,
-                                            block_size);
-
-    // Compute the MSE of the block at the same (x,y) location.
-    double stationary_ssim = SSIM::ssim(*image1, *image2,
-                                        x * block_size, y * block_size,
-                                        x * block_size, y * block_size,
-                                        block_size);
+    SSIM_Grader grader = SSIM_Grader(image1, image2, image2_compressed_static);
 
     // If the MSE found at the stationary location is good enough, add it to the list of matched blocks.
-    if (stationary_ssim >= min_ssim_static) {
-        matched_blocks[x][y] = Block(x * block_size, y * block_size, x * block_size, y * block_size, stationary_ssim);
+    if (grader.passes_metric(x * block_size, y * block_size, x * block_size, y * block_size, this->block_size)) {
+        matched_blocks[x][y] = Block(x * block_size, y * block_size, x * block_size, y * block_size, 9999);
         this->matched_blocks_count++;
-    } else {
-        // If the MSE found at the stationary location isn't good enough, conduct a diamond search looking
-        // for the blocks match nearby.
-        Block result = DiamondSearch::diamond_search_iterative_super(*image2, *image1,
-                                                                     x * block_size, y * block_size,
-                                                                     x * block_size, y * block_size,
-                                                                     1000, block_size, step_size, max_checks);
-
-//        Block result = ExhaustiveSearch::exhaustive_search(*image2, *image1, x * block_size, y * block_size, block_size);
-
-        double block_ssim = SSIM::ssim(*image1, *image2,
-                                       result.x_start, result.y_start,
-                                       result.x_end, result.y_end,
-                                       block_size);
-
-        if (block_ssim >= min_ssim_moving && result.x_end != result.x_start && result.y_end != result.y_start) {
-//            std::cout << " x:  " <<  result.x_start << " -> " <<  result.x_end << " y: " <<  result.y_start << " -> " <<  result.y_end << std::endl;
-            matched_blocks[x][y] = result;
-            this->matched_blocks_count++;
-            this->moving_blocks_count++;
-        }
     }
 }
 

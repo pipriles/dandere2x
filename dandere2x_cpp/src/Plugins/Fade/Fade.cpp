@@ -34,6 +34,7 @@ void Fade::run() {
     int height = image1->height;
     int width = image1->width;
 
+
     for (int x = 0; x < width / block_size; x++) {
         for (int y = 0; y < height / block_size; y++) {
 
@@ -43,12 +44,12 @@ void Fade::run() {
             this->add_scalar_to_copy(x * block_size, y * block_size, scalar);
 
             // find the MSE loss using this weak scalar prediction
-            double fade_ssim = SSIM::ssim(*image1_copy, *image2, x * block_size, y * block_size,
-                                       x * block_size, y * block_size, block_size);
+            double fade_ssim = SSIM_MSE::ssim_mse(*image1_copy, *image2, x * block_size, y * block_size,
+                                                  x * block_size, y * block_size, block_size);
 
             // find the max MSE loss from the compressed image
-            double compressed_ssim = SSIM::ssim(*image2, *image2_compressed, x * block_size, y * block_size,
-                                                    x * block_size, y * block_size, block_size);
+            double compressed_ssim = SSIM_MSE::ssim_mse(*image2, *image2_compressed, x * block_size, y * block_size,
+                                                        x * block_size, y * block_size, block_size);
 
             // only add it to the list of accepted fades if it matches the MSE requirement.
             // If the scalar is zero, don't include (since there won't be any affect)
