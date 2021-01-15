@@ -6,6 +6,7 @@
 #define DANDERE2X_CPP_MSE_GRADER_H
 
 #include <Image/SSIM/SSIM.h>
+#include <Image/ImageUtils.h>
 #include "AbstractMetric.h"
 
 
@@ -21,17 +22,17 @@ public:
 
     bool passes_metric(int initial_x, int initial_y, int variable_x, int variable_y, int blocksize) override {
 
-//        double image_1_image_2_ssim = SSIM_MSE::ssim_mse(*this->image1, *this->image2,
-//                                                 initial_x, initial_y, variable_x, variable_y,
-//                                                 blocksize);
-//
-//        double image_2_image_2_compressed_ssim = SSIM_MSE::ssim_mse(*this->image1, *this->image2,
-//                                                            initial_x, initial_y, variable_x, variable_y,
-//                                                            blocksize);
-//
-//        if (image_1_image_2_ssim >= image_2_image_2_compressed_ssim){
-//            return true;
-//        }
+        double image_1_image_2_ssim = ImageUtils::mse(*this->image1, *this->image2,
+                                                 initial_x, initial_y, variable_x, variable_y,
+                                                 blocksize);
+
+        double image_2_image_2_compressed_ssim = ImageUtils::mse(*this->image2, *this->image2_compressed,
+                                                            initial_x, initial_y, variable_x, variable_y,
+                                                            blocksize);
+
+        if (image_1_image_2_ssim <= image_2_image_2_compressed_ssim){
+            return true;
+        }
 
         return false;
     }

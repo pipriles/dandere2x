@@ -9,6 +9,7 @@
 #include <omp.h>
 #include "Image/SSIM/SSIM-MSE.h"
 #include <Image/Graders/SSIM_Grader.h>
+#include <Image/Graders/MSE_Grader.h>
 
 // Note to self, what happens if pframes declares too many unmatched blocks, but fade made
 // predictions? This is a really niche scenario - I wouldn't imagine it to ever happen.
@@ -158,7 +159,7 @@ void PFrame::match_all_blocks() {
  */
 void PFrame::match_block(int x, int y) {
 
-    SSIM_Grader grader = SSIM_Grader(image1, image2, image2_compressed_static);
+    MSE_Grader grader = MSE_Grader(image1, image2, image2_compressed_static);
 
     // If the MSE found at the stationary location is good enough, add it to the list of matched blocks.
     if (grader.passes_metric(x * block_size, y * block_size, x * block_size, y * block_size, this->block_size)) {

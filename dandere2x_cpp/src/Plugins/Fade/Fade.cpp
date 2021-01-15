@@ -4,6 +4,7 @@
 //Licensed under the GNU General Public License Version 3 (GNU GPL v3),
 //    available at: https://www.gnu.org/licenses/gpl-3.0.txt
 
+#include <Image/Graders/MSE_Grader.h>
 #include "Fade.h"
 
 
@@ -38,6 +39,9 @@ void Fade::run() {
     for (int x = 0; x < width / block_size; x++) {
         for (int y = 0; y < height / block_size; y++) {
 
+
+
+
             // get a scalar value transforming a block at (x,y) f_1 to best match the block in f_2
             int scalar = get_scalar_for_block(x * block_size, y * block_size);
 
@@ -51,9 +55,12 @@ void Fade::run() {
             double compressed_ssim = SSIM_MSE::ssim_mse(*image2, *image2_compressed, x * block_size, y * block_size,
                                                         x * block_size, y * block_size, block_size);
 
+
+            MSE_Grader grader = MSE_Grader(image1_copy, image2, image2_compressed);
+
             // only add it to the list of accepted fades if it matches the MSE requirement.
             // If the scalar is zero, don't include (since there won't be any affect)
-            if (fade_ssim >= compressed_ssim && scalar !=0 ) {
+            if (grader.passes_metric(x * block_size, y * block_size, x * block_size, y * block_size, block_size) && scalar !=0 ) {
                 FadeBlock current_fade;
 
                 current_fade.scalar = scalar;
