@@ -60,7 +60,7 @@ public:
         this->valid = other.valid;
     }
 
-    bool operator<(const Block &other) {
+    bool operator<(const Block &other) const {
         return this->sum < other.sum;
     }
 
