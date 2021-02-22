@@ -19,7 +19,7 @@ from wget import bar_adaptive
 
 
 def get_operating_system():
-    if platform == "linux" or platform == "linux2":
+    if platform == "linux" or platform == "linux2" or platform == "Darwin":
         return 'linux'
     elif platform == "win32":
         return 'win32'
